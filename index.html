@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>PS5 on Rent – SharePal</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fafafa;
+        --card: #fff;
+        --ink: #14213d;
+        --mute: #6b7280;
+        --line: #e8e8ee;
+        --acc: #f26b21;
+        --acc2: #fff1e8;
+        --ok: #16a34a;
+        --chip: #f1f1f5;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #0e1118;
+          --card: #171b25;
+          --ink: #f3f4f8;
+          --mute: #9aa1b2;
+          --line: #262c3a;
+          --acc2: #2a1b12;
+          --chip: #202636;
+        }
+      }
+      :root[data-theme="dark"] {
+        --bg: #0e1118;
+        --card: #171b25;
+        --ink: #f3f4f8;
+        --mute: #9aa1b2;
+        --line: #262c3a;
+        --acc2: #2a1b12;
+        --chip: #202636;
+      }
+      html {
+        scroll-padding-top: env(safe-area-inset-top, 0px);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Inter, system-ui, sans-serif;
+      }
+      header {
+        position: sticky;
+        top: env(safe-area-inset-top, 0px);
+        z-index: 5;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+      }
+      .hd {
+        max-width: 1200px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 20px;
+      }
+      .logo {
+        font-weight: 800;
+        font-size: 22px;
+        letter-spacing: -0.5px;
+      }
+      .logo b {
+        color: var(--acc);
+      }
+      .search {
+        flex: 1;
+        max-width: 520px;
+        position: relative;
+      }
+      .search input {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--bg);
+        color: var(--ink);
+        font: inherit;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+      .search input:focus {
+        outline: none;
+        border-color: var(--acc);
+        box-shadow: 0 0 0 3px var(--acc2);
+      }
+      .city,
+      .ic {
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--ink);
+        border-radius: 10px;
+        padding: 9px 12px;
+        font: 600 13px Inter;
+        cursor: pointer;
+      }
+      main {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+      }
+      .crumb {
+        font-size: 13px;
+        color: var(--mute);
+      }
+      .crumb a {
+        color: inherit;
+        text-decoration: none;
+      }
+      h1 {
+        font-size: 30px;
+        margin: 8px 0 4px;
+        letter-spacing: -0.8px;
+      }
+      .sub {
+        color: var(--mute);
+        margin: 0 0 18px;
+        font-size: 14px;
+      }
+      .bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+      .chip {
+        border: 1px solid var(--line);
+        background: var(--chip);
+        color: var(--ink);
+        padding: 8px 14px;
+        border-radius: 99px;
+        font: 500 13px Inter;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .chip[aria-pressed="true"] {
+        background: var(--acc);
+        border-color: var(--acc);
+        color: #fff;
+      }
+      select {
+        margin-left: auto;
+        padding: 9px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--ink);
+        font: 500 13px Inter;
+      }
+      .count {
+        font-size: 13px;
+        color: var(--mute);
+        margin-bottom: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 18px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: in 0.45s forwards;
+        transition:
+          transform 0.25s,
+          box-shadow 0.25s;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(20, 33, 61, 0.14);
+      }
+      @keyframes in {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .img {
+        aspect-ratio: 1/1;
+        background: linear-gradient(135deg, var(--acc2), var(--chip));
+        display: grid;
+        place-items: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s;
+      }
+      .card:hover .img img {
+        transform: scale(1.05);
+      }
+      .ph {
+        font-size: 46px;
+        position: absolute;
+      }
+      .tag {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font: 700 11px Inter;
+        padding: 4px 9px;
+        border-radius: 99px;
+        background: var(--acc);
+        color: #fff;
+        z-index: 1;
+      }
+      .tag.New {
+        background: #2563eb;
+      }
+      .tag.Vote {
+        background: #7c3aed;
+      }
+      .heart {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 1;
+        border: 0;
+        background: var(--card);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        color: var(--mute);
+        transition: 0.2s;
+      }
+      .heart.on {
+        color: #e11d48;
+        transform: scale(1.12);
+      }
+      .oos .img img {
+        filter: grayscale(1);
+        opacity: 0.55;
+      }
+      .body {
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+      }
+      .nm {
+        font-weight: 600;
+        font-size: 15px;
+        line-height: 1.3;
+        min-height: 40px;
+      }
+      .meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--mute);
+      }
+      .rt {
+        background: var(--ok);
+        color: #fff;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 6px;
+      }
+      .price {
+        font-size: 20px;
+        font-weight: 800;
+      }
+      .price small {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--mute);
+      }
+      .btn {
+        margin-top: auto;
+        border: 0;
+        border-radius: 10px;
+        padding: 11px;
+        font: 700 14px Inter;
+        background: var(--acc);
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn:hover {
+        filter: brightness(1.08);
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn.o {
+        background: var(--chip);
+        color: var(--ink);
+      }
+      .btn.v {
+        background: #7c3aed;
+      }
+      .empty {
+        padding: 60px;
+        text-align: center;
+        color: var(--mute);
+      }
+      #toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+        transform: translate(-50%, 40px);
+        background: var(--ink);
+        color: var(--bg);
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-size: 14px;
+        opacity: 0;
+        transition: 0.3s;
+        z-index: 9;
+      }
+      #toast.s {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+        .city {
+          display: none;
+        }
+        h1 {
+          font-size: 24px;
+        }
+        select {
+          margin-left: 0;
+        }
+        .body {
+          padding: 10px;
+        }
+        .nm {
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="hd">
+        <div class="logo">Share<b>Pal</b></div>
+        <div class="search">
+          <input
+            id="q"
+            type="search"
+            placeholder="Search PS5 combos, games, controllers…"
+            aria-label="Search"
+          />
+        </div>
+        <button class="city">📍 Bengaluru ▾</button
+        ><button class="ic" id="th" aria-label="Theme">🌓</button>
+      </div>
+    </header>
+    <main>
+      <div class="crumb">
+        <a href="#">Home</a> › <a href="#">Gaming Consoles</a> › PS5
+      </div>
+      <h1>PS5 on Rent</h1>
+      <p class="sub">
+        Free delivery &amp; pickup · Refundable deposit · Pay only for the days
+        you play
+      </p>
+      <div class="bar" id="chips"></div>
+      <div class="count" id="count"></div>
+      <div class="grid" id="grid"></div>
+    </main>
+    <div id="toast"></div>
+    <script>
+      const DATA = [
+        {
+          id: 18273,
+          name: "PS5 + Games (100+) + 1 Controller",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-100-games-with-1-controller/ps5-with-100-games-with-1-controller-on-rent-sharepal-1.webp",
+          rating: 4.6,
+          booked_count: 649,
+          tag: "Trending",
+          per_day_rent: 200,
+          out_of_stock: false,
+        },
+        {
+          id: 20242,
+          name: "PS5 All in one Combo + 2 Controllers",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-ea-play-with-100-games-with-2-controllers/ps5-with-2-controllers-with-ea-play-with-ps-plus-deluxe-subscription-combo-on-rent-sharepal-1.webp",
+          rating: 4.5,
+          booked_count: 604,
+          tag: "Trending",
+          per_day_rent: 440,
+          out_of_stock: false,
+        },
+        {
+          id: 18255,
+          name: "PS5 + Games (100+) + 2 Controllers",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-100-games-with-2-controllers/ps5-with-100-games-with-2-controllers-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 397,
+          tag: "Trending",
+          per_day_rent: 260,
+          out_of_stock: false,
+        },
+        {
+          id: 20105,
+          name: "FC25 + 2 Controllers Combo",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-fc25/ps5-with-fc25-with-100-games-with-2-controllerS-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 209,
+          tag: "Trending",
+          per_day_rent: 165,
+          out_of_stock: false,
+        },
+        {
+          id: 8185,
+          name: "PS5 + 1 Controller (Disc or Digital) (No Games Included)",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-1-controller/ps5-console-with-1-controller-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 236,
+          tag: "",
+          per_day_rent: 160,
+          out_of_stock: false,
+        },
+        {
+          id: 18117,
+          name: "PS5 + EA Play + 2 Controllers",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-ea-play-combo-with-2-controllers/ps5-ea-play-combo-with-2-controllers-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 167,
+          tag: "",
+          per_day_rent: 260,
+          out_of_stock: true,
+        },
+        {
+          id: 19716,
+          name: "PS5 All in one Combo + 1 Controller",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-ea-play-with-100-games-with-1-controller/ps5-with-controller-with-ea-play-with-ps-plus-deluxe-subscription-combo-on-rent-sharepal-1.webp",
+          rating: 4.5,
+          booked_count: 187,
+          tag: "Trending",
+          per_day_rent: 260,
+          out_of_stock: true,
+        },
+        {
+          id: 19680,
+          name: "PS5 + 2 Controllers (Disc or Digital) (No Games Included)",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-2%20controllers/ps5-console-with-2-controllers-on-rent-sharepal-1.webp",
+          rating: 4.2,
+          booked_count: 210,
+          tag: "",
+          per_day_rent: 200,
+          out_of_stock: false,
+        },
+        {
+          id: 17795,
+          name: "God Of War Ragnar\u00f6k + 1 Controller (Digital Game)",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-god-of-war-ragnarok/ps5-with-god-of-war-ragnarok-with-100-games-with-1-controller-on-rent-sharepal-1.webp",
+          rating: 4.6,
+          booked_count: 164,
+          tag: "",
+          per_day_rent: 200,
+          out_of_stock: false,
+        },
+        {
+          id: 18055,
+          name: "PS5 + EA Play + 1 Controller",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-ea-play-combo-with-1-controller/ps5-with-controller-with-ea-play-combo-on-rent-sharepal-1.webp",
+          rating: 4.5,
+          booked_count: 211,
+          tag: "",
+          per_day_rent: 180,
+          out_of_stock: false,
+        },
+        {
+          id: 20104,
+          name: "Uncharted Series + 1 Controller (Digital Game)",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-uncharted/ps5-with-uncharted-legacy-of-thieves-with-100-games-with-1-controller-on-rent-sharepal-1.webp",
+          rating: 4.6,
+          booked_count: 171,
+          tag: "",
+          per_day_rent: 200,
+          out_of_stock: false,
+        },
+        {
+          id: 20103,
+          name: "Cricket 24 + 2 Controllers (Digital Game)",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-cricket-24/ps5-with-cricket-24-with-100-games-with-2-controllerS-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 186,
+          tag: "",
+          per_day_rent: 200,
+          out_of_stock: false,
+        },
+        {
+          id: 36028,
+          name: "PS5 + FC26 + 1 Controller",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-fifa26-1-controller/ps5-with-fifa-26-with-1-controller-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 2527,
+          tag: "New",
+          per_day_rent: 310,
+          out_of_stock: false,
+        },
+        {
+          id: 20102,
+          name: "Ghost of Tsushima + 1 Controller (Digital Game)",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-ghost-of-tsushima/ps5-with-ghost-of-tsushima-with-100-games-with-1-controller-on-rent-sharepal-1.webp",
+          rating: 4.6,
+          booked_count: 140,
+          tag: "",
+          per_day_rent: 200,
+          out_of_stock: false,
+        },
+        {
+          id: 20224,
+          name: "PS5 Mega Racing Wheel Combo",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-mega-racing-combo/ps5-with-controller-with-ps-plus-deluxe-subscription-with-ea-play-with-wheel-combo-on-rent-sharepal-1%20(1).webp",
+          rating: 4.8,
+          booked_count: 139,
+          tag: "",
+          per_day_rent: 310,
+          out_of_stock: true,
+        },
+        {
+          id: 36039,
+          name: "PS5 + FC26 + 2 Controllers",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-fifa26-2-controllers/ps5-with-fifa-26-with-2-controllers-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 1524,
+          tag: "New",
+          per_day_rent: 310,
+          out_of_stock: false,
+        },
+        {
+          id: 20098,
+          name: "FC24 + 2 Controllers (Digital Game)",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-fc24/ps5-with-fc24-with-100-games-with-2-controllerS-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 165,
+          tag: "",
+          per_day_rent: 200,
+          out_of_stock: true,
+        },
+        {
+          id: 36050,
+          name: "PS5 + FC26 + 4 Controllers",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-fifa26-4-controllers/ps5-with-fifa-26-with-4-controllers-on-rent-sharepal-1.webp",
+          rating: 4.8,
+          booked_count: 1224,
+          tag: "New",
+          per_day_rent: 310,
+          out_of_stock: false,
+        },
+        {
+          id: 20100,
+          name: "Spider-Man Miles Morales + 1 Controller (Digital Game)",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-with-spiderman-miles-morales/ps5-with-spiderman-miles-morales-with-100-games-with-1-controller-on-rent-sharepal-1.webp",
+          rating: 4.6,
+          booked_count: 123,
+          tag: "",
+          per_day_rent: 200,
+          out_of_stock: false,
+        },
+        {
+          id: 37512,
+          name: "PS5 + FC27 + 2 Controllers",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-fifa27-2-controllers/ps5-with-fifa-27-with-2-controllers-on-rent-sharepal-1.webp",
+          rating: 0,
+          booked_count: 652,
+          tag: "New",
+          per_day_rent: 300,
+          out_of_stock: false,
+        },
+        {
+          id: 37501,
+          name: "PS5 + FC27 + 1 Controller",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-fifa27-1-controller/ps5-with-fifa-27-with-1-controller-on-rent-sharepal-1.webp",
+          rating: 0,
+          booked_count: 658,
+          tag: "New",
+          per_day_rent: 250,
+          out_of_stock: false,
+        },
+        {
+          id: 37534,
+          name: "PS5 + FC27 + 4 Controllers",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps5-fifa27-4-controllers/ps5-with-fifa-27-with-4-controllers-on-rent-sharepal-1.webp",
+          rating: 0,
+          booked_count: 651,
+          tag: "New",
+          per_day_rent: 350,
+          out_of_stock: false,
+        },
+        {
+          id: 37616,
+          name: "PlayStation Portal Remote Player",
+          image:
+            "https://images.sharepal.in/categories/gaming-consoles/ps5/ps-portal-remote-player/ps-portal-on-rent-1.webp",
+          rating: 0,
+          booked_count: 10000,
+          tag: "Vote to Launch",
+          per_day_rent: 158.25,
+          out_of_stock: false,
+        },
+      ];
+      const $ = (s) => document.querySelector(s);
+      let f = { tag: "all", stock: false, fav: new Set(), q: "", sort: "pop" };
+      const chips = [
+        ["all", "All"],
+        ["Trending", "🔥 Trending"],
+        ["New", "✨ New"],
+        ["stock", "In stock only"],
+      ];
+      $("#chips").innerHTML =
+        chips
+          .map(
+            (c) =>
+              `<button class="chip" data-k="${c[0]}" aria-pressed="${c[0] === "all"}">${c[1]}</button>`,
+          )
+          .join("") +
+        `<select id="so" aria-label="Sort"><option value="pop">Most booked</option><option value="lo">Price: low to high</option><option value="hi">Price: high to low</option><option value="rt">Top rated</option></select>`;
+      function toast(m) {
+        const t = $("#toast");
+        t.textContent = m;
+        t.className = "s";
+        clearTimeout(toast.i);
+        toast.i = setTimeout(() => (t.className = ""), 2200);
+      }
+      function render() {
+        let l = DATA.filter(
+          (p) =>
+            (f.tag === "all" ||
+              (f.tag === "New" ? p.tag === "New" : p.tag === f.tag)) &&
+            (!f.stock || !p.out_of_stock) &&
+            p.name.toLowerCase().includes(f.q),
+        );
+        const s = {
+          pop: (a, b) => b.booked_count - a.booked_count,
+          lo: (a, b) => a.per_day_rent - b.per_day_rent,
+          hi: (a, b) => b.per_day_rent - a.per_day_rent,
+          rt: (a, b) => b.rating - a.rating,
+        }[f.sort];
+        l.sort(s);
+        $("#count").textContent =
+          l.length + " product" + (l.length !== 1 ? "s" : "");
+        $("#grid").innerHTML = l.length
+          ? l
+              .map((p, i) => {
+                const v = p.tag === "Vote to Launch",
+                  tc = v ? "Vote" : p.tag;
+                const btn = v
+                  ? `<button class="btn v" data-a="vote">Vote to launch</button>`
+                  : p.out_of_stock
+                    ? `<button class="btn o" data-a="notify">Notify me</button>`
+                    : `<button class="btn" data-a="rent">Rent now</button>`;
+                return `<article class="card ${p.out_of_stock ? "oos" : ""}" style="animation-delay:${Math.min(i, 12) * 40}ms" data-id="${p.id}">
+  <div class="img"><span class="ph">🎮</span>${p.tag ? `<span class="tag ${tc}">${p.tag}</span>` : ""}<button class="heart ${f.fav.has(p.id) ? "on" : ""}" data-a="fav" aria-label="Wishlist">${f.fav.has(p.id) ? "♥" : "♡"}</button>
+  <img loading="lazy" src="${p.image}" alt="${p.name} on rent" onerror="this.remove()"></div>
+  <div class="body"><div class="nm">${p.name}</div>
+  <div class="meta">${p.rating ? `<span class="rt">★ ${p.rating}</span>` : "<span>No ratings yet</span>"}<span>${v ? "" : p.booked_count.toLocaleString("en-IN") + " booked"}</span></div>
+  <div class="price">₹${p.per_day_rent}<small> / day</small></div>${btn}</div></article>`;
+              })
+              .join("")
+          : `<div class="empty">No products match. Try clearing filters.</div>`;
+      }
+      $("#chips").onclick = (e) => {
+        const b = e.target.closest(".chip");
+        if (!b) return;
+        const k = b.dataset.k;
+        if (k === "stock") {
+          f.stock = !f.stock;
+          b.setAttribute("aria-pressed", f.stock);
+        } else {
+          f.tag = k;
+          document
+            .querySelectorAll(".chip")
+            .forEach(
+              (c) =>
+                c.dataset.k !== "stock" &&
+                c.setAttribute("aria-pressed", c === b),
+            );
+        }
+        render();
+      };
+      $("#so").onchange = (e) => {
+        f.sort = e.target.value;
+        render();
+      };
+      $("#q").oninput = (e) => {
+        f.q = e.target.value.toLowerCase().trim();
+        render();
+      };
+      $("#grid").onclick = (e) => {
+        const b = e.target.closest("[data-a]");
+        if (!b) return;
+        const id = +b.closest(".card").dataset.id,
+          a = b.dataset.a;
+        if (a === "fav") {
+          f.fav.has(id) ? f.fav.delete(id) : f.fav.add(id);
+          b.classList.toggle("on");
+          b.textContent = f.fav.has(id) ? "♥" : "♡";
+        } else
+          toast(
+            {
+              rent: "Added to cart",
+              notify: "We'll notify you when it's back",
+              vote: "Thanks for voting!",
+            }[a],
+          );
+      };
+      $("#th").onclick = () => {
+        const r = document.documentElement,
+          d =
+            r.dataset.theme === "dark" ||
+            (!r.dataset.theme &&
+              matchMedia("(prefers-color-scheme:dark)").matches);
+        r.dataset.theme = d ? "light" : "dark";
+      };
+      render();
+    </script>
+  </body>
+</html>
